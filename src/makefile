@@ -23,7 +23,7 @@ OBJ = $(patsubst %, $(ODIR)/%, $(_OBJ))
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-parallel_norm: $(OBJ)
+parallel_norm.out: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS) $(MACHINE)
 
 # this .PHONY rule keeps make from doing
@@ -32,6 +32,6 @@ parallel_norm: $(OBJ)
 
 # pre-compile cleaning rule
 clean:
-	/bin/rm -f $(ODIR)/*.o *~ core $(IDIR)/*~
+	/bin/rm -f $(ODIR)/*.o *~ *.out $(IDIR)/*~
 
 # end
