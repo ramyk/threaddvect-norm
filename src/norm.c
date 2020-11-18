@@ -3,7 +3,9 @@
 #include <math.h>
 #include <pthread.h>
 
+#ifndef NB_THREADS
 #define NB_THREADS 6
+#endif
 
 float norm(float* U, int n)
 {
@@ -51,7 +53,9 @@ float vect_norm(float* U, int n)
 
 // threading utilities
 //
-double result[NB_THREADS];
+float result[NB_THREADS];
+pthread_mutex_t result_lock;
+float thrd_result = 0;
 pthread_t thread_ptr[NB_THREADS];
 struct thread_data {
     unsigned int id;
@@ -97,10 +101,10 @@ void* thread_vectnorm(void* threadargs)
 
     __m256 partnorm = _mm256_set1_ps(0.0f);
     __m256 placeholder;
-    for (int i = start; i < end / 8; i++) {
+    for (long i = start; i < end; i += 8) {
         placeholder = _mm256_sqrt_ps(
             _mm256_abs_ps(
-                _mm256_loadu_ps(U + 8 * i)));
+                _mm256_loadu_ps(U + i)));
         partnorm = _mm256_add_ps(partnorm, placeholder);
     }
 
@@ -121,7 +125,6 @@ float normPar(float* U, int n, int nb_threads, int mode)
     float sum = 0;
     int i = 0;
     for (i = 0; i < nb_threads; i++) {
-        printf("wahda\n");
         th_array[i].id = i;
         th_array[i].U = U;
         th_array[i].start = i * n / nb_threads;

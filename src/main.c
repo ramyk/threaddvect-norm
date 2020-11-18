@@ -4,7 +4,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-#define N 48000
+#define N 4800000
 #ifndef NB_THREADS
 #define NB_THREADS 6
 #endif
