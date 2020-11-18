@@ -4,7 +4,10 @@
 #include <sys/time.h>
 #include <time.h>
 
-#define N 100000
+#define N 48000
+#ifndef NB_THREADS
+#define NB_THREADS 6
+#endif
 
 double now()
 {
@@ -18,7 +21,6 @@ double now()
 }
 
 int main(int argc, char** argv)
-
 {
     double tm, seq_tm, vect_tm, thrd_tm, thrdvect_tm;
     float du;
@@ -49,6 +51,26 @@ int main(int argc, char** argv)
     printf("Vectorial norm val:\t\t%lf\n", du);
     printf("Vectorial norm time (E-03 s):\t%f\n", vect_tm);
     printf("Vectorial norm acceleration:\t%f\n", seq_tm / vect_tm);
+
+    printf("--------------------------------------------\n");
+
+    // threaded norm
+    tm = now();
+    du = normPar(V, N, NB_THREADS, 0);
+    thrd_tm = now() - tm;
+    printf("Threaded norm val:\t\t%lf\n", du);
+    printf("Threaded norm time (E-03 s):\t%f\n", thrd_tm);
+    printf("Threaded norm acceleration:\t%f\n", seq_tm / thrd_tm);
+
+    printf("--------------------------------------------\n");
+
+    // threaded vectorial norm
+    tm = now();
+    du = normPar(V, N, NB_THREADS, 1);
+    thrdvect_tm = now() - tm;
+    printf("Threaded vect-norm val:\t\t%lf\n", du);
+    printf("Threaded vect-norm time (E-03 s):\t%f\n", thrdvect_tm);
+    printf("Threaded vect-norm acceleration:\t%f\n", seq_tm / thrdvect_tm);
 
     printf("--------------------------------------------\n");
 }
