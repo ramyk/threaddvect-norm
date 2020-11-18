@@ -3,7 +3,7 @@
 #include <math.h>
 #include <pthread.h>
 
-#define NB_THREADS 12
+#define NB_THREADS 6
 
 float norm(float* U, int n)
 {
@@ -61,6 +61,7 @@ struct thread_data {
 };
 struct thread_data th_array[NB_THREADS];
 
+// per-thread scalar code
 void* thread_scalarnorm(void* threadargs)
 {
     struct thread_data* thrdlocal_data;
@@ -84,6 +85,7 @@ void* thread_scalarnorm(void* threadargs)
     return 0;
 }
 
+// per-thread vectorial code
 void* thread_vectnorm(void* threadargs)
 {
     struct thread_data* thrdlocal_data;
@@ -117,13 +119,22 @@ void* thread_vectnorm(void* threadargs)
 float normPar(float* U, int n, int nb_threads, int mode)
 {
     float sum = 0;
-    for (long i = 0; i < nb_threads; i++) {
+    int i = 0;
+    for (i = 0; i < nb_threads; i++) {
+        printf("wahda\n");
         th_array[i].id = i;
+        th_array[i].U = U;
         th_array[i].start = i * n / nb_threads;
         th_array[i].end = (i + 1) * n / nb_threads;
+        // create thread i
         pthread_create(thread_ptr + i, NULL,
             (mode == 0) ? thread_scalarnorm : thread_vectnorm,
             th_array + i);
+    }
+    // wait for every thrad to finish
+    for (i = 0; i < nb_threads; i++) {
+        pthread_join(thread_ptr[i], NULL);
+        sum += result[i];
     }
     return sum;
 }
