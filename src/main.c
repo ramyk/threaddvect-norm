@@ -1,4 +1,5 @@
 #include "norm.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -24,7 +25,7 @@ int main(int argc, char** argv)
 {
     double tm, seq_tm, vect_tm, thrd_tm, thrdvect_tm;
     float du;
-    printf("---- Norm Parallel/Vectorized Computing ----\n");
+    printf("------- Norm Parallel/Vectorized Computing -------\n");
     float* V = malloc(N * sizeof(float));
 
     // initialize the rand vector
@@ -38,39 +39,39 @@ int main(int argc, char** argv)
     // sequential norm
     tm = now();
     du = norm(V, N);
-    seq_tm = now() - tm;
-    printf("Sequential norm val:\t\t%lf\n", du);
-    printf("Sequential norm time (E-03 s):\t%f\n", seq_tm);
+    seq_tm = fabs(now() - tm);
+    printf("Sequential norm val:\t\t\t%.2lf\n", du);
+    printf("Sequential norm time (E-03 s):\t\t%f\n", seq_tm);
 
-    printf("--------------------------------------------\n");
+    printf("--------------------------------------------------\n");
 
     // vectorial norm
     tm = now();
     du = vect_norm(V, N);
-    vect_tm = now() - tm;
-    printf("Vectorial norm val:\t\t%lf\n", du);
-    printf("Vectorial norm time (E-03 s):\t%f\n", vect_tm);
-    printf("Vectorial norm acceleration:\t%f\n", seq_tm / vect_tm);
+    vect_tm = fabs(now() - tm);
+    printf("Vectorial norm val:\t\t\t%.2lf\n", du);
+    printf("Vectorial norm time (E-03 s):\t\t%f\n", vect_tm);
+    printf("Vectorial norm acceleration:\t\t%f\n", seq_tm / vect_tm);
 
-    printf("--------------------------------------------\n");
+    printf("--------------------------------------------------\n");
 
     // threaded norm
     tm = now();
     du = normPar(V, N, NB_THREADS, 0);
-    thrd_tm = now() - tm;
-    printf("Threaded norm val:\t\t%lf\n", du);
-    printf("Threaded norm time (E-03 s):\t%f\n", thrd_tm);
-    printf("Threaded norm acceleration:\t%f\n", seq_tm / thrd_tm);
+    thrd_tm = fabs(now() - tm);
+    printf("Threaded norm val:\t\t\t%.2lf\n", du);
+    printf("Threaded norm time (E-03 s):\t\t%f\n", thrd_tm);
+    printf("Threaded norm acceleration:\t\t%f\n", seq_tm / thrd_tm);
 
-    printf("--------------------------------------------\n");
+    printf("--------------------------------------------------\n");
 
     // threaded vectorial norm
     tm = now();
     du = normPar(V, N, NB_THREADS, 1);
-    thrdvect_tm = now() - tm;
-    printf("Threaded vect-norm val:\t\t%lf\n", du);
+    thrdvect_tm = fabs(now() - tm);
+    printf("Threaded vect-norm val:\t\t\t%.2lf\n", du);
     printf("Threaded vect-norm time (E-03 s):\t%f\n", thrdvect_tm);
     printf("Threaded vect-norm acceleration:\t%f\n", seq_tm / thrdvect_tm);
 
-    printf("--------------------------------------------\n");
+    printf("--------------------------------------------------\n");
 }
