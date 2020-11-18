@@ -15,4 +15,6 @@ make
 ```
 
 ### Execution example
+<em>Note that the result inconsistency is due to the use of single-precision floating-point format (float / 32bit pres).</em>
+
 <img src="./screenex.png">
