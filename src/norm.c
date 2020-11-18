@@ -53,9 +53,11 @@ float vect_norm(float* U, int n)
 
 // threading utilities
 //
-float result[NB_THREADS];
-pthread_mutex_t result_lock;
-float thrd_result = 0;
+// We can use an array to get values from the
+// threads, or simply a mutex and a shared variable
+// float shared_du = 0;
+// pthread_mutex_t mute_du;
+float partial_result[NB_THREADS];
 pthread_t thread_ptr[NB_THREADS];
 struct thread_data {
     unsigned int id;
@@ -77,13 +79,17 @@ void* thread_scalarnorm(void* threadargs)
     long end = thrdlocal_data->end;
 
     //body of the thread
-    float rslt = 0;
+    float partial_du = 0;
     for (long i = start; i < end; i++)
-        rslt += sqrt(fabs(U[i]));
+        partial_du += sqrt(fabs(U[i]));
 
     // return thread result to the
     // global threads results array
-    result[id] = rslt;
+    partial_result[id] = partial_du;
+    // or use the shared variable for sum
+    // pthread_mutex_lock(&mute_du);
+    // shared_du += partial_du;
+    // pthread_mutex_unlock(&mute_du);
 
     pthread_exit(NULL);
     return 0;
@@ -111,11 +117,15 @@ void* thread_vectnorm(void* threadargs)
     float partnorm_f[8] __attribute__((aligned(32)));
     _mm256_store_ps(partnorm_f, partnorm);
 
-    float du = 0;
+    float partial_du = 0;
     for (int i = 0; i < 8; i++)
-        du += partnorm_f[i];
+        partial_du += partnorm_f[i];
 
-    result[id] = du;
+    partial_result[id] = partial_du;
+    // pthread_mutex_lock(&mute_du);
+    // shared_du += partial_du;
+    // pthread_mutex_unlock(&mute_du);
+
     pthread_exit(NULL);
     return 0;
 }
@@ -137,7 +147,8 @@ float normPar(float* U, int n, int nb_threads, int mode)
     // wait for every thrad to finish
     for (i = 0; i < nb_threads; i++) {
         pthread_join(thread_ptr[i], NULL);
-        sum += result[i];
+        sum += partial_result[i];
     }
+
     return sum;
 }
