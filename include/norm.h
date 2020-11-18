@@ -5,8 +5,6 @@
 
 float norm(float*, int);
 float vect_norm(float*, int);
-
-// avx utilities
-__m256 _mm256_abs_ps(__m256);
+float normPar(float*, int, int, int);
 
 #endif // __NORM_H_
