@@ -23,6 +23,23 @@ __m256 _mm256_abs_ps(__m256 vect)
     return _mm256_andnot_ps(signbit, vect);
 }
 
+/*
+** This version of vect_norm deals with unaligned
+** arrays as it's loading the _mm256_loadu_ps variant
+** of load intrinsics which ignores the address
+** alignment, but another way to do so is by using
+** the more efficient _mm256_load_ps function and as
+** it requires aligned addresses, we will align ourselves
+** the first vector by mixing the first memory cases
+** that aren't aligned in the array with the last
+** non-aligned ones using _mm256_shuffle_ps and a bit mask:
+** EX:
+** a:|-----xxx|         We combine shuffle a and e
+** b:|xxxxxxxx|         lines into one cache line
+** c:|xxxxxxxx|  ---->  using shuffle and 2 bit masks
+** d:|xxxxxxxx|         and then we'll have an aligned
+** e:|xxxxx---|         array to use with _mm256_load_ps
+ */
 float vect_norm(float* U, int n)
 {
     // get the partial U norm vector
